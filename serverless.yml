@@ -1,0 +1,72 @@
+tenant: jeremychan
+app: marksix-scraper
+
+service: marksix-scraper
+
+provider:
+  name: aws
+  runtime: nodejs10.x
+  stage: dev
+  environment:
+    RESULTS_TABLE: ${self:service}-${opt:stage, self:provider.stage}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+      Resource: "*"
+
+plugins:
+  - serverless-offline
+  - serverless-dynamodb-local
+
+functions:
+  scrapeMarkSixResults:
+    handler: handler.scrapeMarkSixResults
+    events:
+     - http:
+         path: /scrape
+         method: POST
+         private: false
+  getAllResults:
+    handler: handler.getAllMarkSixResults
+    events:
+      - http: 
+          path: /
+          method: get  
+
+resources:
+  Resources:
+    CandidatesDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: "drawDate"
+            AttributeType: "S"   
+        KeySchema:
+          -
+            AttributeName: "drawDate"
+            KeyType: "HASH"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        StreamSpecification:
+          StreamViewType: "NEW_AND_OLD_IMAGES"
+        TableName: ${self:provider.environment.RESULTS_TABLE}
+
+custom:
+  dynamodb:
+    stages:
+      - dev
+    start:
+      port: 3001
+      inMemory: true
+      heapInitial: 200m
+      heapMax: 1g
+      migrate: true
+      seed: true
+      convertEmptyValues: true
