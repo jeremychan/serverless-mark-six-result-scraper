@@ -42,6 +42,26 @@ const getResultsFromDb = (callback) => {
   dynamoDb.scan(params, onScan);
 }
 
+const getDrawDatesFromDb = (callback) => {
+  var params = {
+      TableName: process.env.RESULTS_TABLE,
+      IndexName: "drawDateIndex"
+  };
+  const onScan = (err, data) => {
+      if (err) {
+          console.log('Scan failed to load data. Error JSON:', JSON.stringify(err, null, 2));
+          callback(err);
+      } else {
+          console.log("Scan succeeded.");
+          return callback(null, {
+              statusCode: 200,
+              body: JSON.stringify(data.Items.map(i => i['drawDate']))
+          });
+      }
+  };
+  dynamoDb.scan(params, onScan);
+}
+
 const saveResultsToDb = async (results) => {
   for (result of results) {
     await saveResultToDb(resultInfo(result))
@@ -71,5 +91,6 @@ module.exports = {
  catchEm,
  saveResultToDb,
  saveResultsToDb,
- getResultsFromDb
+ getResultsFromDb,
+ getDrawDatesFromDb
 };

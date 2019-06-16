@@ -35,3 +35,7 @@ module.exports.scrapeMarkSixResults = async (event) => {
 module.exports.getAllMarkSixResults = (event, context, callback) => {
   return helpers.getResultsFromDb(callback)
 };
+
+module.exports.getDrawDates = (event, context, callback) => {
+  return helpers.getDrawDatesFromDb(callback)
+};

@@ -30,6 +30,12 @@ functions:
          path: /scrape
          method: POST
          private: false
+  getDrawDates:
+    handler: handler.getDrawDates
+    events:
+      - http: 
+          path: /dates
+          method: get  
   getAllResults:
     handler: handler.getAllMarkSixResults
     events:
@@ -57,6 +63,16 @@ resources:
         StreamSpecification:
           StreamViewType: "NEW_AND_OLD_IMAGES"
         TableName: ${self:provider.environment.RESULTS_TABLE}
+        GlobalSecondaryIndexes:
+        - IndexName: drawDateIndex
+          KeySchema:
+            - AttributeName: drawDate
+              KeyType: HASH
+          Projection:
+            ProjectionType: KEYS_ONLY
+          ProvisionedThroughput:
+            ReadCapacityUnits: '1'
+            WriteCapacityUnits: '1'
 
 custom:
   dynamodb:
