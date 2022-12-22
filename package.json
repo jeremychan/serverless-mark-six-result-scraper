@@ -10,7 +10,7 @@
   },
   "devDependencies": {
     "serverless-dynamodb-local": "^0.2.35",
-    "serverless-offline": "^5.3.3"
+    "serverless-offline": "^12.0.3"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
